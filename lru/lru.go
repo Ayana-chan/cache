@@ -9,7 +9,7 @@ type Cache struct {
 	capacity    int64
 	list        *linkedlist.LinkedList
 	cache       map[string]*linkedlist.Element
-	OnEvicted   func(key string, value linkedlist.Value)
+	OnEvicted   func(key string, value linkedlist.Value) //当一个element被删除时执行该方法
 }
 
 func New(maxCapacity int64, onEvicted func(string, linkedlist.Value)) *Cache {
@@ -54,6 +54,7 @@ func (c *Cache) Add(key string, value linkedlist.Value) {
 	}
 }
 
+// GetCapacity 返回当前lru列表的数据量
 func (c *Cache) GetCapacity() int64 {
 	return c.capacity
 }
