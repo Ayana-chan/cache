@@ -2,6 +2,8 @@ package controller
 
 import (
 	"cache/cachestruct"
+	"fmt"
+	"log"
 	"sync"
 )
 
@@ -47,4 +49,36 @@ func GetGroup(name string) *Group {
 	g := groups[name]
 	mu.RUnlock()
 	return g
+}
+
+func (g *Group) Get(key string) (cachestruct.Data, error) {
+	if key == "" {
+		return cachestruct.Data{}, fmt.Errorf("key is required")
+	}
+
+	if v, ok := g.mainCache.Get(key); ok {
+		log.Println("Cache Hit")
+		return v, nil
+	}
+
+	return g.load(key)
+}
+
+func (g *Group) load(key string) (value cachestruct.Data, err error) {
+	return g.getLocally(key)
+}
+
+func (g *Group) getLocally(key string) (cachestruct.Data, error) {
+	bytes, err := g.getter.Get(key)
+	if err != nil {
+		return cachestruct.Data{}, err
+
+	}
+	value := cachestruct.Data{B: cachestruct.CloneBytes(bytes)}
+	g.populateCache(key, value)
+	return value, nil
+}
+
+func (g *Group) populateCache(key string, value cachestruct.Data) {
+	g.mainCache.Add(key, value)
 }

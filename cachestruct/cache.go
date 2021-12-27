@@ -12,7 +12,7 @@ type Cache struct {
 	CacheBytes int64 //lru的最大容量
 }
 
-func (c *Cache) add(key string, value Container) {
+func (c *Cache) Add(key string, value Data) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.lru == nil {
@@ -21,14 +21,14 @@ func (c *Cache) add(key string, value Container) {
 	c.lru.Add(key, value)
 }
 
-func (c *Cache) get(key string) (value Container, ok bool) {
+func (c *Cache) Get(key string) (value Data, ok bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.lru == nil {
 		return
 	}
 	if v, ok := c.lru.Get(key); ok {
-		return v.(Container), ok
+		return v.(Data), ok
 	}
 	return
 }
