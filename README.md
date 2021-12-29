@@ -6,7 +6,7 @@
 &emsp;&emsp;启动一个Router：
 ```run go run_router.go 多个节点地址（以空格分隔） -端口号 -每个真实节点对应的虚拟节点数```
 
-###基本信息
+### 基本信息
 &emsp;&emsp;每个节点用lru来管理数据，Router通过一致性哈希算法来管理节点。当前仅实现了查询与设值。
 
 ### HTTP API
