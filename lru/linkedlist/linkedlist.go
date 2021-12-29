@@ -1,5 +1,6 @@
 package linkedlist
 
+// Element 队列元素，包含Data用来存储数据
 type Element struct {
 	Key   string
 	Value Data
@@ -7,6 +8,7 @@ type Element struct {
 	Next  *Element
 }
 
+// LinkedList 一个双向队列
 type LinkedList struct {
 	Head *Element
 	Tail *Element
@@ -30,6 +32,7 @@ func New() *LinkedList {
 	return &list
 }
 
+// Remove 删除一个元素
 func (list *LinkedList) Remove(element *Element) {
 	next := element.Next
 	pre := element.Pre
@@ -37,6 +40,7 @@ func (list *LinkedList) Remove(element *Element) {
 	pre.Next = next
 }
 
+// AddToHead 将一个元素加到队列头部
 func (list *LinkedList) AddToHead(element *Element) {
 	head := list.Head
 	headNext := head.Next

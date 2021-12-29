@@ -13,8 +13,7 @@ import (
 const defaultBasePath = "/cache/"
 
 type NodeServer struct {
-	// 例如 "https://example.net:8000"
-	self      string
+	self      string // 自己的端口号，例如 ":8000"
 	basePath  string
 	mainCache cachestruct.Cache //缓存数据
 }
@@ -34,37 +33,55 @@ func (p *NodeServer) Log(format string, v ...interface{}) {
 	log.Printf("[NodeServer %s] %s", p.self, fmt.Sprintf(format, v...))
 }
 
-// ServeHTTP handle all http requests
+// ServeHTTP 处理来自router的请求
 func (p *NodeServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
 	//查询
 	if r.Method == "GET" {
+
+		//检查请求base地址是否正确
 		if !strings.HasPrefix(r.URL.Path, p.basePath) {
 			panic("HTTPPool serving unexpected path: " + r.URL.Path)
 		}
 		p.Log("%s %s", r.Method, r.URL.Path)
+
 		// /<basepath>/<key>中取出key
 		key := r.URL.Path[len(p.basePath):]
+
 		if len(key) == 0 {
-			http.Error(w, "bad request", http.StatusBadRequest) //key为空，返回400
+
+			//key为空，返回400
+			http.Error(w, "bad request", http.StatusBadRequest)
+
 			return
 		}
 		data, ok := p.mainCache.Get(key)
 		if !ok {
-			http.Error(w, "cache miss", 404) //未命中，返回404
+
+			//未命中，返回404
+			http.Error(w, "cache miss", 404)
+
 			return
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.Write(data.ByteSlice())
 		return
-	} else if r.Method == "POST" { //设值
+
+		//设值
+	} else if r.Method == "POST" {
 		if !strings.HasPrefix(r.URL.Path, p.basePath) {
 			panic("HTTPPool serving unexpected path: " + r.URL.Path)
 		}
 		p.Log("%value %value", r.Method, r.URL.Path)
-		// /<basepath>/<key>中取出key
+
+		// 在/<basepath>/<key>中取出key
 		key := r.URL.Path[len(p.basePath):]
+
 		if len(key) == 0 {
-			http.Error(w, "bad request", http.StatusBadRequest) //key为空，返回400
+
+			//key为空，返回400
+			http.Error(w, "bad request", http.StatusBadRequest)
+
 			return
 		}
 		value, _ := ioutil.ReadAll(r.Body)

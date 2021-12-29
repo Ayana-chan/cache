@@ -24,7 +24,10 @@ func New(replicas int, fn Hash) *Map {
 		hashMap:  make(map[int]string),
 	}
 	if m.hash == nil {
-		m.hash = crc32.ChecksumIEEE //默认的哈希函数
+
+		//默认的哈希函数
+		m.hash = crc32.ChecksumIEEE
+
 	}
 	return m
 }
@@ -32,11 +35,18 @@ func New(replicas int, fn Hash) *Map {
 // Add 向Map中添加真实节点
 func (m *Map) Add(addrs ...string) {
 	for _, addr := range addrs {
-		for i := 0; i < m.replicas; i++ { //添加虚拟节点
+
+		//添加虚拟节点
+		for i := 0; i < m.replicas; i++ {
 			hash := int(m.hash([]byte(strconv.Itoa(i) + addr)))
-			m.keys = append(m.keys, hash) //将节点的哈希值加入数组
+
+			//将节点的哈希值加入数组
+			m.keys = append(m.keys, hash)
+
+			//将虚拟节点映射到真实节点地址
 			m.hashMap[hash] = addr
 		}
+
 	}
 	sort.Ints(m.keys) //使数组有序
 }
@@ -47,8 +57,12 @@ func (m *Map) Get(key string) string {
 		return ""
 	}
 	hash := int(m.hash([]byte(key)))
+
+	//寻找大于key的哈希值的最小虚拟节点哈希值
 	idx := sort.Search(len(m.keys), func(i int) bool {
 		return m.keys[i] >= hash
 	})
-	return m.hashMap[m.keys[idx%len(m.keys)]] //取模是因为key的hash可能大于所有节点的hash，这时应定位到第一个节点
+
+	//取模是因为key的hash可能大于所有节点的hash，这时应定位到第一个节点
+	return m.hashMap[m.keys[idx%len(m.keys)]]
 }

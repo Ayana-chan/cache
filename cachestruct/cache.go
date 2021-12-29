@@ -17,7 +17,10 @@ func (c *Cache) Add(key string, value linkedlist.Data) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.lru == nil {
-		c.lru = lru.New(c.CacheBytes, nil) //延迟初始化lru
+
+		//延迟初始化lru
+		c.lru = lru.New(c.CacheBytes, nil)
+
 	}
 	c.lru.Add(key, value)
 }
