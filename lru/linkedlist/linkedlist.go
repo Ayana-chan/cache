@@ -2,13 +2,9 @@ package linkedlist
 
 type Element struct {
 	Key   string
-	Value Value
+	Value Data
 	Pre   *Element
 	Next  *Element
-}
-
-type Value interface {
-	Length() int
 }
 
 type LinkedList struct {
@@ -19,11 +15,11 @@ type LinkedList struct {
 func New() *LinkedList {
 	head := Element{
 		Key:   "Head",
-		Value: nil,
+		Value: Data{},
 	}
 	tail := Element{
 		Key:   "Tail",
-		Value: nil,
+		Value: Data{},
 	}
 	head.Next = &tail
 	tail.Pre = &head
