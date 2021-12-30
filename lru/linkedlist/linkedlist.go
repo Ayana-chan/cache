@@ -1,6 +1,6 @@
 package linkedlist
 
-// Element 队列元素，包含Data用来存储数据
+// Element 队列节点，包含Data用来存储数据
 type Element struct {
 	Key   string
 	Value Data
