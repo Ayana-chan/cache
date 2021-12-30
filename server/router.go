@@ -5,9 +5,11 @@ import (
 	"cache/consistenthash"
 	"cache/lru/linkedlist"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -52,7 +54,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		value, statusCode := router.getRoute(key)
-		if statusCode == 404 {
+		if statusCode == 404 || statusCode == 999 {
 
 			//未命中，返回404
 			http.Error(w, "cache miss", 404)
@@ -78,12 +80,25 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		nodeAddr := router.HashCircle.Get(key)
 		value, _ := ioutil.ReadAll(r.Body)
-
-		//复制value的reader
-		reader := bytes.NewReader(value)
-
-		resp, _ := http.Post("http://"+nodeAddr+defaultBasePath+key, "raw", reader)
+		resp, err := http.Post("http://"+nodeAddr+defaultBasePath+key, "raw", bytes.NewReader(value))
 		defer resp.Body.Close()
+
+		//发现节点宕机,删除该节点，并不断尝试设值直到成功将值设到正常的节点中，如果节点全部失效，关闭当前Router
+		for err != nil && len(router.HashCircle.Keys) != 0 {
+			router.Log("Node DOWN: " + nodeAddr)
+			router.HashCircle.Delete(nodeAddr)
+			nodeAddr = router.HashCircle.Get(key)
+			resp, err = doPost("http://"+nodeAddr+defaultBasePath+key, "raw", bytes.NewReader(value))
+		}
+
+		//全部节点均失效
+		if len(router.HashCircle.Keys) == 0 {
+			router.Log("No node running")
+			router.Log("router DOWN")
+			http.Error(w, "router DOWN", http.StatusServiceUnavailable)
+			os.Exit(-1)
+		}
+
 		router.Log("SET " + key + ":" + string(value))
 	}
 }
@@ -91,7 +106,15 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 //查询对应节点
 func (router *Router) getRoute(key string) (*linkedlist.Data, int) {
 	nodeAddr := router.HashCircle.Get(key)
-	resp, _ := http.Get("http://" + nodeAddr + defaultBasePath + key)
+	resp, err := http.Get("http://" + nodeAddr + defaultBasePath + key)
+
+	//发现节点宕机，删除该节点
+	if err != nil {
+		router.Log("Node down: " + nodeAddr)
+		router.HashCircle.Delete(nodeAddr)
+		return nil, 999
+	}
+
 	defer resp.Body.Close()
 	statusCode := resp.StatusCode
 	if statusCode == 404 {
@@ -99,4 +122,11 @@ func (router *Router) getRoute(key string) (*linkedlist.Data, int) {
 	}
 	value, _ := ioutil.ReadAll(resp.Body)
 	return &linkedlist.Data{B: value}, 200
+}
+
+//为了关闭尝试节点是否有效的请求中的所有Body，创建此函数
+func doPost(url string, contentType string, body io.Reader) (resp *http.Response, err error) {
+	resp, err = http.Post(url, contentType, body)
+	defer resp.Body.Close()
+	return resp, err
 }
