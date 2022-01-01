@@ -2,7 +2,7 @@
 &emsp;&emsp;详细信息见<https://taofengliu.github.io/分布式缓存/>
 ### 启动方法
 &emsp;&emsp;启动一个节点： 
-```run go run_nodeserver.go -端口号 -LRU容量```
+```run go run_nodeserver.go -端口号 -LRU容量(单位：字节)```
 
 &emsp;&emsp;启动一个Router：
 ```run go run_router.go 多个节点地址（以空格分隔） -端口号 -每个真实节点对应的虚拟节点数```
