@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"cache/consistenthash"
 	"cache/lru/linkedlist"
+	"cache/singleflight"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -17,6 +18,7 @@ type Router struct {
 	self       string // 自己的端口号，例如 ":8000"
 	basePath   string
 	HashCircle *consistenthash.Map //哈希环
+	loader     *singleflight.Group
 }
 
 // NewRouter 初始化一个Router
@@ -25,6 +27,7 @@ func NewRouter(self string, replicas int) *Router {
 		self:       self,
 		basePath:   defaultBasePath,
 		HashCircle: consistenthash.New(replicas, nil),
+		loader:     &singleflight.Group{},
 	}
 }
 
@@ -53,7 +56,10 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
-		value, statusCode := router.getRoute(key)
+		value, statusCode := router.loader.Do(key, func() (interface{}, int) {
+			return router.getRoute(key)
+		})
+
 		if statusCode == 404 || statusCode == 999 {
 
 			//未命中，返回404
@@ -62,7 +68,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Write(value.ByteSlice())
+		w.Write(value.(linkedlist.Data).ByteSlice())
 
 		//设值
 	} else if r.Method == "POST" {
