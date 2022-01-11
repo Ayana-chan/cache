@@ -19,7 +19,7 @@ type NodeServer struct {
 }
 
 // NewNodeServer 初始化一个NodeServer
-func NewNodeServer(self string, cacheBytes int64) *NodeServer {
+func NewNodeServer(self string, cacheBytes int) *NodeServer {
 	return &NodeServer{
 		self:     self,
 		basePath: defaultBasePath,
@@ -89,5 +89,19 @@ func (p *NodeServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		p.mainCache.Add(key, linkedlist.Data{
 			B: value,
 		})
+	} else if r.Method == "DELETE" {
+		if !strings.HasPrefix(r.URL.Path, p.basePath) {
+			panic("HTTPPool serving unexpected path: " + r.URL.Path)
+		}
+		p.Log("%value %value", r.Method, r.URL.Path)
+		key := r.URL.Path[len(p.basePath):]
+		if len(key) == 0 {
+
+			//key为空，返回400
+			http.Error(w, "bad request", http.StatusBadRequest)
+
+			return
+		}
+		p.mainCache.Delete(key)
 	}
 }

@@ -10,7 +10,7 @@ import (
 type Cache struct {
 	mu         sync.Mutex
 	lru        *lru.Cache
-	CacheBytes int64 //lru的最大容量,单位是字节
+	CacheBytes int //lru的最大容量,单位是字节
 }
 
 func (c *Cache) Add(key string, value linkedlist.Data) {
@@ -35,4 +35,8 @@ func (c *Cache) Get(key string) (value linkedlist.Data, ok bool) {
 		return v, ok
 	}
 	return
+}
+
+func (c *Cache) Delete(key string) {
+	c.lru.Delete(key)
 }

@@ -62,6 +62,14 @@ func (c *Cache) Add(key string, value linkedlist.Data) {
 	}
 }
 
+func (c *Cache) Delete(key string) {
+	if element, ok := c.cache[key]; ok {
+		list := c.list
+		list.Remove(element)
+		delete(c.cache, element.Key)
+	}
+}
+
 // GetCapacity 返回当前lru列表的数据量
 func (c *Cache) GetCapacity() int {
 	return c.capacity

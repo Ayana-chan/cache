@@ -106,6 +106,27 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		router.Log("SET " + key + ":" + string(value))
+	} else if r.Method == "DELETE" {
+		router.Log("%s %s", r.Method, r.URL.Path)
+
+		// /<basepath>/<key>中取出key
+		key := r.URL.Path[len(router.basePath):]
+
+		if len(key) == 0 {
+
+			//key为空，返回400
+			http.Error(w, "bad request", http.StatusBadRequest)
+
+			return
+		}
+		nodeAddr := router.HashCircle.Get(key)
+		req, _ := http.NewRequest("DELETE", "http://"+nodeAddr+defaultBasePath+key, nil)
+		res, err := http.DefaultClient.Do(req)
+		defer res.Body.Close()
+		if err != nil {
+			router.Log("Node down: " + nodeAddr)
+			router.HashCircle.Delete(nodeAddr)
+		}
 	}
 }
 
