@@ -38,11 +38,17 @@ func (c *Cache) Get(key string) (value linkedlist.Data, ok bool) {
 }
 
 func (c *Cache) Delete(key string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	c.lru.Delete(key)
 }
 
 // GetAll 获取所有数据的键值对字符串数组，但不会涉及lru
 func (c *Cache) GetAll() []string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	//尚未初始化
 	if c.lru == nil {
 		return []string{}

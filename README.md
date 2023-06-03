@@ -31,3 +31,14 @@
 
 ### 2022年1月6日更新
 &emsp;&emsp;在Router增加了singleflight，并发的多个针对同一key的查询将只会路由一次便返回结果。
+
+### 2023年6月3日更新 by Ayana
+&emsp;&emsp;修复了两处编译时错误。
+
+&emsp;&emsp;添加了bat文件，双击即可启动一个router和三个node。
+
+&emsp;&emsp;配置了跨域；在nodeserver中新增接口（PUT方法）以获取此节点的所有键值对，以方便测试。
+
+&emsp;&emsp;开发了测试用的前端（请安装NodeJS以使用）。
+
+&emsp;&emsp;为delete流程上锁。

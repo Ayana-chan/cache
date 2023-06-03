@@ -114,7 +114,6 @@ func (p *NodeServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !strings.HasPrefix(r.URL.Path, p.basePath) {
 			panic("HTTPPool serving unexpected path: " + r.URL.Path)
 		}
-		p.Log("%value %value", r.Method, r.URL.Path)
 
 		data := p.mainCache.GetAll()
 		jsonData, _ := json.Marshal(data)
