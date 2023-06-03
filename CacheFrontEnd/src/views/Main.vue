@@ -1,4 +1,7 @@
 <script setup>
+import { onMounted } from 'vue';
+import { callPerPeriod } from '../utils';
+
 const { proxy } = getCurrentInstance();
 
 function getKey(key) {
@@ -72,6 +75,37 @@ const putForm = reactive({
 const deleteForm = reactive({
   key: '',
 });
+
+const dataList = reactive({
+  dataList: [[], [], []],
+});
+
+function getSingleNodeData(port, number) {
+  proxy.$http
+    .httpRequest({
+      url: 'http://localhost:' + port + '/cache/',
+      method: 'put',
+    })
+    .then(
+      (res) => {
+        // console.log('getSingleNodeData success', port, res.data);
+        dataList.dataList[number] = res.data.sort();
+      },
+      (reason) => {
+        // console.log('getSingleNodeData failed', reason);
+      }
+    );
+}
+
+function refreshData() {
+  getSingleNodeData(5001, 0);
+  getSingleNodeData(5002, 1);
+  getSingleNodeData(5003, 2);
+}
+
+onMounted(() => {
+  callPerPeriod(500, -1, refreshData);
+});
 </script>
 
 <template>
@@ -119,6 +153,27 @@ const deleteForm = reactive({
       </el-form>
     </div>
   </div>
+
+  <div class="data-list">
+    <div class="all-data">
+      <div class="data-list-title">Node 1 port: 5001</div>
+      <div v-for="item in dataList.dataList[0]">
+        <div>{{ item }}</div>
+      </div>
+    </div>
+    <div class="all-data">
+      <div class="data-list-title">Node 2 port: 5002</div>
+      <div v-for="item in dataList.dataList[1]">
+        <div>{{ item }}</div>
+      </div>
+    </div>
+    <div class="all-data">
+      <div class="data-list-title">Node 3 port: 5003</div>
+      <div v-for="item in dataList.dataList[2]">
+        <div>{{ item }}</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -129,5 +184,20 @@ const deleteForm = reactive({
 .op-form {
   margin: 20px;
   width: 200px;
+}
+
+.data-list {
+  display: flex;
+}
+
+.all-data {
+  margin: 30px;
+  padding: 5px;
+  border: 1px #ababab solid;
+}
+
+.data-list-title {
+  font-size: large;
+  font-weight: 900;
 }
 </style>
