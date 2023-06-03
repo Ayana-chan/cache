@@ -37,7 +37,7 @@
 
 &emsp;&emsp;添加了bat文件，双击即可启动一个router和三个node。
 
-&emsp;&emsp;配置了跨域；在nodeserver中新增接口（PUT方法）以获取此节点的所有键值对，以方便测试。
+&emsp;&emsp;配置了跨域；在nodeserver中新增接口（PUT方法），可以获取此节点的所有键值对，方便测试。
 
 &emsp;&emsp;开发了测试用的前端（请安装NodeJS以使用）。
 
