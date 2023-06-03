@@ -40,3 +40,14 @@ func (c *Cache) Get(key string) (value linkedlist.Data, ok bool) {
 func (c *Cache) Delete(key string) {
 	c.lru.Delete(key)
 }
+
+// GetAll 获取所有数据的键值对字符串数组，但不会涉及lru
+func (c *Cache) GetAll() []string {
+	//尚未初始化
+	if c.lru == nil {
+		return []string{}
+	}
+
+	dataList := c.lru.GetAll()
+	return dataList
+}

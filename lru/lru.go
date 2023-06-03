@@ -70,6 +70,15 @@ func (c *Cache) Delete(key string) {
 	}
 }
 
+func (c *Cache) GetAll() []string {
+	dataList := make([]string, 0, len(c.cache))
+	for k, v := range c.cache {
+		kv := k + ":" + v.Value.String()
+		dataList = append(dataList, kv)
+	}
+	return dataList
+}
+
 // GetCapacity 返回当前lru列表的数据量
 func (c *Cache) GetCapacity() int {
 	return c.capacity

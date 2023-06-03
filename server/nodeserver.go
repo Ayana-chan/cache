@@ -3,6 +3,7 @@ package server
 import (
 	"cache/cachestruct"
 	"cache/lru/linkedlist"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -108,5 +109,18 @@ func (p *NodeServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		p.mainCache.Delete(key)
+	} else if r.Method == "PUT" {
+		//测试用，获取本地所有的数据
+		if !strings.HasPrefix(r.URL.Path, p.basePath) {
+			panic("HTTPPool serving unexpected path: " + r.URL.Path)
+		}
+		p.Log("%value %value", r.Method, r.URL.Path)
+
+		data := p.mainCache.GetAll()
+		jsonData, _ := json.Marshal(data)
+
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Write(jsonData)
+		return
 	}
 }
