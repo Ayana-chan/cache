@@ -68,7 +68,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Write(value.(linkedlist.Data).ByteSlice())
+		w.Write(value.(*linkedlist.Data).ByteSlice())
 
 		//设值
 	} else if r.Method == "POST" {
@@ -130,7 +130,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//查询对应节点
+// 查询对应节点
 func (router *Router) getRoute(key string) (*linkedlist.Data, int) {
 	nodeAddr := router.HashCircle.Get(key)
 	resp, err := http.Get("http://" + nodeAddr + defaultBasePath + key)
@@ -151,7 +151,7 @@ func (router *Router) getRoute(key string) (*linkedlist.Data, int) {
 	return &linkedlist.Data{B: value}, 200
 }
 
-//为了关闭尝试节点是否有效的请求中的所有Body，创建此函数
+// 为了关闭尝试节点是否有效的请求中的所有Body，创建此函数
 func doPost(url string, contentType string, body io.Reader) (resp *http.Response, err error) {
 	resp, err = http.Post(url, contentType, body)
 	defer resp.Body.Close()

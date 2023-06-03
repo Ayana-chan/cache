@@ -15,5 +15,5 @@ func main() {
 	fmt.Println("[NodeServer " + addr + "] Node is running")
 	fmt.Println("[NodeServer " + addr + "] Port" + addr)
 	fmt.Println("[NodeServer " + addr + "] Capacity:" + capacity)
-	http.ListenAndServe(addr, server.NewNodeServer(addr, cap))
+	http.ListenAndServe(addr, server.NewNodeServer(addr, int(cap)))
 }
