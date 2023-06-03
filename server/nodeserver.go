@@ -35,6 +35,8 @@ func (p *NodeServer) Log(format string, v ...interface{}) {
 
 // ServeHTTP 处理来自router的请求
 func (p *NodeServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")             //允许访问所有域
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type") //header的类型
 
 	//查询
 	if r.Method == "GET" {

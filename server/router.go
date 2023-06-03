@@ -37,6 +37,9 @@ func (router *Router) Log(format string, v ...interface{}) {
 
 func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")             //允许访问所有域
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type") //header的类型
+
 	//检查请求base地址是否正确
 	if !strings.HasPrefix(r.URL.Path, router.basePath) {
 		panic("HTTPPool serving unexpected path: " + r.URL.Path)
