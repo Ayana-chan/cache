@@ -9,7 +9,7 @@ import (
 func TestGet(t *testing.T) {
 	data := linkedlist.Data{B: []byte("hello")}
 	fmt.Println(data)
-	c := New(3, func(key string, val linkedlist.Data) {
+	c := New(14, func(key string, val linkedlist.Data) {
 		fmt.Println("delete " + key)
 	})
 	head := c.list.Head

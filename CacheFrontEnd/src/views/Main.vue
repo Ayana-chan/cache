@@ -93,6 +93,7 @@ function getSingleNodeData(port, number) {
       },
       (reason) => {
         // console.log('getSingleNodeData failed', reason);
+        dataList.dataList[number] = ['* CRASH *'];
       }
     );
 }
