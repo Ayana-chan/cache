@@ -36,6 +36,7 @@ func (c *Cache) Get(key string) (value linkedlist.Data, ok bool) {
 
 func (c *Cache) Add(key string, value linkedlist.Data) {
 	if _, ok := c.Get(key); ok {
+		c.capacity = c.capacity - c.cache[key].Value.Length() + value.Length()
 		c.cache[key].Value = value
 	} else {
 		element := linkedlist.Element{
@@ -45,20 +46,20 @@ func (c *Cache) Add(key string, value linkedlist.Data) {
 		c.list.AddToHead(&element)
 		c.cache[key] = &element
 		c.capacity += element.Value.Length()
+	}
 
-		//容量超过限度
-		for c.capacity > c.maxCapacity {
-			toRemove := c.list.Tail.Pre
-			c.list.Remove(toRemove)
-			delete(c.cache, toRemove.Key)
-			c.capacity -= toRemove.Value.Length()
+	//容量超过限度
+	for c.capacity > c.maxCapacity {
+		toRemove := c.list.Tail.Pre
+		c.list.Remove(toRemove)
+		delete(c.cache, toRemove.Key)
+		c.capacity -= toRemove.Value.Length()
 
-			//执行回调方法
-			if c.OnEvicted != nil {
-				c.OnEvicted(toRemove.Key, toRemove.Value)
-			}
-
+		//执行回调方法
+		if c.OnEvicted != nil {
+			c.OnEvicted(toRemove.Key, toRemove.Value)
 		}
+
 	}
 }
 

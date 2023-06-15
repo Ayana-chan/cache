@@ -78,7 +78,7 @@ func (p *NodeServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !strings.HasPrefix(r.URL.Path, p.basePath) {
 			panic("HTTPPool serving unexpected path: " + r.URL.Path)
 		}
-		p.Log("%value %value", r.Method, r.URL.Path)
+		p.Log("%v %v", r.Method, r.URL.Path)
 
 		// 在/<basepath>/<key>中取出key
 		key := r.URL.Path[len(p.basePath):]
@@ -99,7 +99,7 @@ func (p *NodeServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !strings.HasPrefix(r.URL.Path, p.basePath) {
 			panic("HTTPPool serving unexpected path: " + r.URL.Path)
 		}
-		p.Log("%value %value", r.Method, r.URL.Path)
+		p.Log("%v %v", r.Method, r.URL.Path)
 		key := r.URL.Path[len(p.basePath):]
 		if len(key) == 0 {
 
